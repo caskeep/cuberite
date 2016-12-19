@@ -461,7 +461,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	}  // for y
 	//*/
 
-	cSetChunkDataPtr SetChunkData(new cSetChunkData(
+	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockTypes, MetaData,
 		IsLightValid ? BlockLight : nullptr,
@@ -469,8 +469,8 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		nullptr, Biomes,
 		std::move(Entities), std::move(BlockEntities),
 		false
-	));
-	m_World->QueueSetChunkData(SetChunkData);
+	);
+	m_World->QueueSetChunkData(std::move(SetChunkData));
 	return true;
 }
 
@@ -1658,7 +1658,7 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	{
 		Boat->SetMaterial(cBoat::StringToMaterial(a_NBT.GetString(TypeIdx)));
 	}
-	a_Entities.push_back(Boat.release());
+	a_Entities.emplace_back(std::move(Boat));
 }
 
 
@@ -1672,7 +1672,7 @@ void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedN
 	{
 		return;
 	}
-	a_Entities.push_back(EnderCrystal.release());
+	a_Entities.emplace_back(std::move(EnderCrystal));
 }
 
 
@@ -1697,7 +1697,7 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 	{
 		return;
 	}
-	a_Entities.push_back(FallingBlock.release());
+	a_Entities.emplace_back(std::move(FallingBlock));
 }
 
 
@@ -1711,7 +1711,7 @@ void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	{
 		return;
 	}
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(std::move(Minecart));
 }
 
 
@@ -1743,7 +1743,7 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 			Minecart->SetSlot(a_NBT.GetByte(Slot), Item);
 		}
 	}  // for itr - ItemDefs[]
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(std::move(Minecart));
 }
 
 
@@ -1760,7 +1760,7 @@ void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	// TODO: Load the Push and Fuel tags
 
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(std::move(Minecart));
 }
 
 
@@ -1777,7 +1777,7 @@ void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	// TODO: Everything to do with TNT carts
 
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(std::move(Minecart));
 }
 
 
@@ -1794,7 +1794,7 @@ void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	// TODO: Everything to do with hopper carts
 
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(std::move(Minecart));
 }
 
 
@@ -1828,7 +1828,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Pickup->SetAge(a_NBT.GetShort(Age));
 	}
 
-	a_Entities.push_back(Pickup.release());
+	a_Entities.emplace_back(std::move(Pickup));
 }
 
 
@@ -1850,7 +1850,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		TNT->SetFuseTicks(static_cast<int>(a_NBT.GetByte(FuseTicks)));
 	}
 
-	a_Entities.push_back(TNT.release());
+	a_Entities.emplace_back(std::move(TNT));
 }
 
 
@@ -1879,7 +1879,7 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		ExpOrb->SetReward(a_NBT.GetShort(Reward));
 	}
 
-	a_Entities.push_back(ExpOrb.release());
+	a_Entities.emplace_back(std::move(ExpOrb));
 }
 
 
@@ -1944,7 +1944,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		ItemFrame->SetItemRotation(static_cast<Byte>(a_NBT.GetByte(Rotation)));
 	}
 
-	a_Entities.push_back(ItemFrame.release());
+	a_Entities.emplace_back(std::move(ItemFrame));
 }
 
 
@@ -1967,7 +1967,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	}
 
 	LoadHangingFromNBT(*Painting.get(), a_NBT, a_TagIdx);
-	a_Entities.push_back(Painting.release());
+	a_Entities.emplace_back(std::move(Painting));
 }
 
 
@@ -2038,7 +2038,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	}
 
 	// Store the new arrow in the entities list:
-	a_Entities.push_back(Arrow.release());
+	a_Entities.emplace_back(std::move(Arrow));
 }
 
 
@@ -2061,7 +2061,7 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 	SplashPotion->SetPotionColor(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
 
 	// Store the new splash potion in the entities list:
-	a_Entities.push_back(SplashPotion.release());
+	a_Entities.emplace_back(std::move(SplashPotion));
 }
 
 
@@ -2077,7 +2077,7 @@ void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	}
 
 	// Store the new snowball in the entities list:
-	a_Entities.push_back(Snowball.release());
+	a_Entities.emplace_back(std::move(Snowball));
 }
 
 
@@ -2093,7 +2093,7 @@ void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 	}
 
 	// Store the new egg in the entities list:
-	a_Entities.push_back(Egg.release());
+	a_Entities.emplace_back(std::move(Egg));
 }
 
 
@@ -2109,7 +2109,7 @@ void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	}
 
 	// Store the new fireball in the entities list:
-	a_Entities.push_back(Fireball.release());
+	a_Entities.emplace_back(std::move(Fireball));
 }
 
 
@@ -2125,7 +2125,7 @@ void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT
 	}
 
 	// Store the new FireCharge in the entities list:
-	a_Entities.push_back(FireCharge.release());
+	a_Entities.emplace_back(std::move(FireCharge));
 }
 
 
@@ -2141,7 +2141,7 @@ void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cPar
 	}
 
 	// Store the new enderpearl in the entities list:
-	a_Entities.push_back(Enderpearl.release());
+	a_Entities.emplace_back(std::move(Enderpearl));
 }
 
 
@@ -2161,7 +2161,7 @@ void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2181,7 +2181,7 @@ void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2201,7 +2201,7 @@ void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2221,7 +2221,7 @@ void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2241,7 +2241,7 @@ void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2261,7 +2261,7 @@ void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2281,7 +2281,7 @@ void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNB
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2301,7 +2301,7 @@ void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2321,7 +2321,7 @@ void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2341,7 +2341,7 @@ void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2361,7 +2361,7 @@ void cWSSAnvil::LoadGuardianFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2407,7 +2407,7 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2427,7 +2427,7 @@ void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2456,7 +2456,7 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2476,7 +2476,7 @@ void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2530,7 +2530,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2563,7 +2563,7 @@ void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2607,7 +2607,7 @@ void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2653,7 +2653,7 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2673,7 +2673,7 @@ void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2701,7 +2701,7 @@ void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2730,7 +2730,7 @@ void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2750,7 +2750,7 @@ void cWSSAnvil::LoadSnowGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2770,7 +2770,7 @@ void cWSSAnvil::LoadSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2790,7 +2790,7 @@ void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2832,7 +2832,7 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	}
 
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2852,7 +2852,7 @@ void cWSSAnvil::LoadWitchFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2878,7 +2878,7 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetWitherInvulnerableTicks(static_cast<unsigned int>(a_NBT.GetInt(CurrLine)));
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2954,7 +2954,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -2995,7 +2995,7 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 
@@ -3028,7 +3028,7 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(std::move(Monster));
 }
 
 

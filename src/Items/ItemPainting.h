@@ -70,11 +70,10 @@ public:
 				{ "BurningSkull" }
 			};
 
-			cPainting * Painting = new cPainting(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
-			if (!Painting->Initialize(*a_World))
+			auto PaintingPtr = cpp14::make_unique<cPainting>(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto Painting = PaintingPtr.get();
+			if (!Painting->Initialize(std::move(PaintingPtr), *a_World))
 			{
-				delete Painting;
-				Painting = nullptr;
 				return false;
 			}
 

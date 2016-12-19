@@ -61,9 +61,9 @@ class cBroadcaster;
 class cDeadlockDetect;
 
 typedef std::list< cPlayer * > cPlayerList;
-typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
+typedef std::list< std::pair< std::unique_ptr<cPlayer>, cWorld * > > cAwaitingPlayerList;
 
-typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
+typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
 typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
@@ -237,7 +237,7 @@ public:
 
 	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
 	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
-	void QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData);
+	void QueueSetChunkData(cSetChunkDataPtr a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -267,13 +267,13 @@ public:
 	Uses a queue to store the player object until the Tick thread processes the addition event.
 	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking.
 	If a_OldWorld is provided, a corresponding ENTITY_CHANGED_WORLD event is triggerred after the addition. */
-	void AddPlayer(cPlayer * a_Player, cWorld * a_OldWorld = nullptr);
+	void AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld = nullptr);
 
 	/** Removes the player from the world.
 	Removes the player from the addition queue, too, if appropriate.
 	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
 	@param a_RemoveFromChunk determines if the entity should be removed from its chunk as well. Should be false when ticking from cChunk. */
-	void RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk);
+	std::unique_ptr<cPlayer> RemovePlayer(cPlayer & a_Player, bool a_RemoveFromChunk);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -296,7 +296,7 @@ public:
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
 	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
-	void AddEntity(cEntity * a_Entity);
+	void AddEntity(OwnedEntity a_Entity);
 
 	/** Returns true if an entity with the specified UniqueID exists in the world.
 	Note: Only loaded chunks are considered. */
@@ -800,7 +800,9 @@ public:
 	/** Spawns a mob of the specified type. Returns the mob's UniqueID if recognized and spawned, cEntity::INVALID_ID otherwise */
 	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby = false) override;  // tolua_export
 
-	UInt32 SpawnMobFinalize(cMonster * a_Monster);
+	/** Wraps cEntity::Initialize, doing Monster-specific things before spawning the monster.
+	Takes ownership of the given Monster reference. */
+	UInt32 SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster);
 
 	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */

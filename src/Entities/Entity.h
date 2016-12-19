@@ -158,7 +158,7 @@ public:
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
-	virtual bool Initialize(cWorld & a_World);
+	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
 	// tolua_begin
 
@@ -661,8 +661,6 @@ private:
 	While this ticks, a player can't hit this entity. */
 	int m_InvulnerableTicks;
 } ;  // tolua_export
-
-typedef std::list<cEntity *> cEntityList;
 
 
 
